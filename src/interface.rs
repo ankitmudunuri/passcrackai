@@ -16,3 +16,10 @@ pub fn create_view(inp_table: &HashMap<String, Vec<String>>) -> prettytable::Tab
 
     return table;
 }
+
+pub fn print(inp_table: & prettytable::Table) -> (){
+    print!("{esc}c", esc = 27 as char);
+    inp_table.printstd();
+}
+
+fn parse_actions

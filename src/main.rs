@@ -4,12 +4,7 @@ use std::io;
 use std::fs;
 use std::path::Path;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
-use rand::RngCore;
 use rand::rngs::OsRng;
-use aes_gcm::{Aes256Gcm, Key, Nonce};
-use aes_gcm::aead::{KeyInit, Aead};
-use serde_json;
-use base64;
 use std::process;
 mod interface;
 mod passwordstrength;
@@ -111,7 +106,7 @@ fn create_password() {
 fn main() {
 
     let mut passfile = match File::open("files/entrypass.json") {
-        Err(why) => File::create("files/entrypass.json").expect("Unable to create file"),
+        Err(_why) => File::create("files/entrypass.json").expect("Unable to create file"),
         Ok(file) => file,
     };
 
@@ -133,20 +128,12 @@ fn main() {
 
     }
     
-    let mut passmap: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
+    let passmap: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
 
-    println!("Works past creating hash map");
+    let vistable: prettytable::Table = interface::create_view(&passmap);
 
-    let mut vistable: prettytable::Table = interface::create_view(&passmap);
-
-    println!("Creates table");
-
-    vistable.printstd();
+    interface::print(&vistable);
 
     let password = "Test1234";
-
-    let strength = passwordstrength::prediction(password)?;
-
-    println!("Strength: {}", strength);
 
 }
