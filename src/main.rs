@@ -12,7 +12,6 @@ use serde_json;
 use base64;
 use std::process;
 mod interface;
-mod passwordstrength;
 
 fn encrypt_password(pass: &str) -> String {
     let salt = argon2::password_hash::SaltString::generate(&mut OsRng);
@@ -141,12 +140,10 @@ fn main() {
 
     println!("Creates table");
 
-    vistable.printstd();
+    interface::print_table(&vistable);
 
     let password = "Test1234";
 
-    let strength = passwordstrength::prediction(password)?;
-
-    println!("Strength: {}", strength);
+    
 
 }

@@ -1,7 +1,7 @@
 use prettytable::{Table, row, cell};
 use std::collections::HashMap;
 
-pub fn create_view(inp_table: &HashMap<String, Vec<String>>) -> prettytable::Table {
+pub fn create_view(inp_data: &HashMap<String, Vec<String>>) -> prettytable::Table {
     // Format of table:
     // | Account Domain | Username | Password | Password Strength |
 
@@ -9,10 +9,16 @@ pub fn create_view(inp_table: &HashMap<String, Vec<String>>) -> prettytable::Tab
 
     table.set_titles(row!["Account Domain", "Username", "Password", "Password Strength"]);
 
-    for (k, v) in inp_table {
+    for (k, v) in inp_data {
         table.add_row(row![k, v[0], v[1], v[2]]);
     }
 
 
     return table;
+}
+
+pub fn print_table(inp_table: &prettytable::Table) -> (){
+    print!("{esc}c", esc = 27 as char);
+    inp_table.printstd();
+    return;
 }
