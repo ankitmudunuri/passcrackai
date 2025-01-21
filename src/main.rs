@@ -1,108 +1,20 @@
-use std::fs::File;
-use std::io::prelude::*;
-use std::io;
-use std::fs;
-use std::path::Path;
-use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
-use rand::rngs::OsRng;
-use std::process;
 mod interface;
+mod login;
 
-fn encrypt_password(pass: &str) -> String {
-    let salt = argon2::password_hash::SaltString::generate(&mut OsRng);
+use std::collections::HashMap;
+use std::fs::File;
+use std::fs;
+use std::process;
+use std::io::prelude::*;
+use std::path::Path;
+use crossterm::{
+    event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
+    terminal::{disable_raw_mode, enable_raw_mode}
+};
 
-    let argon2 = Argon2::default();
 
-    let passhash = argon2.hash_password(pass.as_bytes(), &salt).expect("Failed to hash password");
 
-    return passhash.to_string();
-
-}
-
-fn login(phc: &str) {
-    let mut inputpass = String::new();
-    
-    let parsed_hash = PasswordHash::new(phc).expect("Stored hash is invalid");
-
-    let mut counter = 0;
-    let argon2obj = Argon2::default();
-
-    loop {
-
-        print!("Enter the password to access the manager: ");
-        let _ = io::stdout().flush();
-
-        io::stdin().read_line(&mut inputpass).expect("Failed to read input I/O");
-
-        if argon2obj.verify_password(inputpass.as_bytes(), &parsed_hash).is_ok() {
-            break;
-        } else {
-            counter += 1;
-            if counter == 5{
-                println!("Too many failed attempts!");
-                println!("[Press ENTER to exit]");
-                io::stdin().read_line(&mut inputpass).expect("Failed to pause");
-                process::exit(0);
-            }
-            else{ 
-                println!("The password is incorrect, please try again!");
-                continue;
-            }
-        }
-        
-    }
-
-    return;
-}
-
-fn create_password() {
-    let mut input = String::new();
-    let mut conf = String::new();
-
-    loop{
-        print!("Enter the password you want to use: ");
-
-        let _ = io::stdout().flush();
-        io::stdin().read_line(&mut input).expect("Failed to read input");
-        print!("Confirm your password: ");
-
-        _ = io::stdout().flush();
-        io::stdin().read_line(&mut conf).expect("Failed to read input");
-
-        if input != conf{
-            print!("Passwords do not match! Please try again.\n");
-            input.clear();
-            conf.clear();
-            continue;
-        }
-        else{
-            break;
-        }
-    }
-
-    let phc = encrypt_password(&input);
-
-    if Path::new("files/entrypass.json").exists() {
-        
-        let f = File::create("files/entrypass.json").expect("Unable to create file");
-        let mut filebuf = io::BufWriter::new(f);
-
-        filebuf.write(phc.as_bytes()).expect("Couldn't write");
-        
-        filebuf.flush().expect("Unable to flush buffer");
-    }
-    else {
-        let f = File::create("files/entrypass.json").expect("Unable to create file");
-        let mut filebuf = io::BufWriter::new(f);
-        
-        filebuf.write(phc.as_bytes()).expect("Couldn't write");
-        
-        filebuf.flush().expect("Unable to flush buffer");
-    }
-
-}
-
-fn main() {
+fn main(){
 
     let mut passfile = match File::open("files/entrypass.json") {
         Err(_why) => File::create("files/entrypass.json").expect("Unable to create file"),
@@ -115,37 +27,48 @@ fn main() {
         Ok(_) => 
         if passwords.is_empty() {
             println!("Welcome! This is your first time, so you must create a password.");
-            create_password();
+            login::create_password();
         }
         else {
             println!("Welcome back!");
             let phctext = fs::read_to_string("files/entrypass.json").expect("Unable to read file");
             
-            login(&phctext);
+            login::login(&phctext);
 
         }
 
     }
-    
-    let passmap: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
 
-    let vistable: prettytable::Table = interface::create_view(&passmap);
+    let mut bankfile = match File::open("files/passwordbank.txt") {
+        Err(_why) => File::create("files/passwordbank.txt").expect("Unable to create file"),
+        Ok(file) => file,
+    };
 
-<<<<<<< HEAD
-    let mut vistable: prettytable::Table = interface::create_view(&passmap);
+    let mut passbank = String::new();
+    let mut test: HashMap<String, Vec<String>> = std::collections::HashMap::new();
+    match bankfile.read_to_string(&mut passbank) {
+        Err(why) => panic!("Error reading: {}", why),
+        Ok(_) => 
+        if passbank.is_empty() {
+            
+        }
+        else {
+            //test = deserialize(test);
 
-    println!("Creates table");
 
-    interface::print_table(&vistable);
+        }
 
-    let password = "Test1234";
+    }
 
-    
+    let mut tabletest = interface::ITable::init(&mut test);
 
-=======
-    interface::print(&vistable);
+    let mut valtest: Vec<String> = vec!["amudunuri22".to_string(), "Test1234".to_string(), "1".to_string(), "0".to_string()];
+    let mut valdom: String = "Yahoo".to_string();
 
-    let password = "Test1234";
+    tabletest.update(valdom, valtest);
+    tabletest.print();
 
->>>>>>> df8428dc41ecc76a6674805202fbdcbd60915cf6
+    tabletest.remove("Yahoo".to_string());
+
+    tabletest.print();
 }
