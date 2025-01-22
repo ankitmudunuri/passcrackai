@@ -1,16 +1,11 @@
 mod interface;
 mod login;
+mod appio;
 
 use std::collections::HashMap;
 use std::fs::File;
 use std::fs;
-use std::process;
 use std::io::prelude::*;
-use std::path::Path;
-use crossterm::{
-    event::{self, Event, KeyCode, KeyEvent, KeyModifiers},
-    terminal::{disable_raw_mode, enable_raw_mode}
-};
 
 
 
@@ -22,18 +17,20 @@ fn main(){
     };
 
     let mut passwords = String::new();
+    let mut password = String::new();
+    let mut salt: String = String::new();
     match passfile.read_to_string(&mut passwords) {
         Err(why) => panic!("Error reading: {}", why),
         Ok(_) => 
         if passwords.is_empty() {
             println!("Welcome! This is your first time, so you must create a password.");
-            login::create_password();
+            (password, salt) = login::create_password();
         }
         else {
             println!("Welcome back!");
             let phctext = fs::read_to_string("files/entrypass.json").expect("Unable to read file");
             
-            login::login(&phctext);
+            (password, salt) = login::login(&phctext);
 
         }
 
@@ -53,22 +50,29 @@ fn main(){
             
         }
         else {
-            //test = deserialize(test);
 
 
         }
 
     }
-
+    
     let mut tabletest = interface::ITable::init(&mut test);
 
-    let mut valtest: Vec<String> = vec!["amudunuri22".to_string(), "Test1234".to_string(), "1".to_string(), "0".to_string()];
-    let mut valdom: String = "Yahoo".to_string();
+/*
 
-    tabletest.update(valdom, valtest);
-    tabletest.print();
+    let valtest: Vec<String> = vec!["amudunuri22".to_string(), "Test1234".to_string(), "1".to_string(), "0".to_string()];
+    let valdom: String = "Yahoo".to_string();
 
-    tabletest.remove("Yahoo".to_string());
+    tabletest.add(valdom, valtest);
 
+    let valtest2: Vec<String> = vec!["amudunuri".to_string(), "Test5678".to_string(), "3".to_string(), "1".to_string()];
+    let valdom2: String = "Gmail".to_string();
+
+    tabletest.add(valdom2, valtest2);
+
+    tabletest.store(password.clone(), salt.clone());
+    */
+
+    tabletest.load(password, salt);
     tabletest.print();
 }

@@ -1,5 +1,7 @@
+use argon2::password_hash::SaltString;
 use prettytable::{Table, row, cell};
 use std::collections::HashMap;
+mod datastore;
 
 pub struct ITable <'a>{
     table: prettytable::Table,
@@ -26,13 +28,13 @@ impl ITable <'_>{
     
     pub fn print(&self){
         print!("{esc}c", esc = 27 as char);
-        &self.table.printstd();
+        self.table.printstd();
         return;
     }
 
     pub fn get_size(&self) -> i64 { return self.size; }
 
-    pub fn update(&mut self, key: String, value: Vec<String>) -> (){
+    pub fn add(&mut self, key: String, value: Vec<String>) -> (){
         self.passmap.insert(key.clone(), value.clone());
         self.table.add_row(row![key, value[0], value[1], value[2]]);
         self.size += 1;
@@ -40,10 +42,23 @@ impl ITable <'_>{
     }
 
     pub fn remove(&mut self, key: String) -> (){
-        let mut idx = self.passmap[&key][3].parse::<i64>();
+        let idx = self.passmap[&key][3].parse::<i64>();
         self.passmap.remove(&key.clone());
         self.table.remove_row(idx.expect("Not int").try_into().unwrap());
         self.size -= 1;
         return;
+    }
+
+    pub fn store(&self, password: String, salt: String) -> (){
+        let tempdata = datastore::serialize(self.passmap);
+        datastore::store_data(tempdata, password,salt);
+    }
+
+    pub fn load(&mut self, password: String, salt: String) -> (){
+        datastore::load_data(self.passmap, password, salt);
+        for (k, v) in self.passmap.clone() {
+            self.table.add_row(row![k, v[0], v[1], v[2]]);
+            self.size += 1;
+        }
     }
 }

@@ -4,14 +4,14 @@ use serde::Deserialize;
 use std::io::prelude::*;
 use std::io;
 use std::fs::File;
-use std::fs;
 use std::process;
 use std::path::Path;
 
 #[derive(Deserialize)]
 struct HashSalt {
     hash: String,
-    salt: String
+    salt: String,
+    banksalt: String,
 }
 
 pub fn encrypt_password(pass: &str) -> (String, argon2::password_hash::SaltString){
@@ -25,7 +25,7 @@ pub fn encrypt_password(pass: &str) -> (String, argon2::password_hash::SaltStrin
 
 }
 
-pub fn login(phc: &str) {
+pub fn login(phc: &str) -> (String, String){
 
     let parsed: HashSalt = serde_json::from_str(phc).expect("Failed to parse JSON");
 
@@ -61,10 +61,10 @@ pub fn login(phc: &str) {
         
     }
 
-    return;
+    return (inputpass, parsed.banksalt);
 }
 
-pub fn create_password() {
+pub fn create_password() -> (String, String) {
     let mut input = String::new();
     let mut conf = String::new();
 
@@ -90,12 +90,15 @@ pub fn create_password() {
     }
 
     let (phc, salt) = encrypt_password(&input);
+    let banksalt = argon2::password_hash::SaltString::generate(&mut OsRng);
 
+
+    // Note to self: Clean this shit up and remove redundancy when you get the chance (were you sleep deprived when you wrote this??)
     if Path::new("files/entrypass.json").exists() {
         
         let f = File::create("files/entrypass.json").expect("Unable to create file");
         let mut filebuf = io::BufWriter::new(f);
-        let retstr = format!("{{\"hash\": \"{}\", \"salt\": \"{}\"}}", phc, salt.as_str());
+        let retstr = format!("{{\"hash\": \"{}\", \"salt\": \"{}\", \"banksalt\": \"{}\"}}", phc, salt.as_str(), banksalt.as_str());
 
         filebuf.write(retstr.as_bytes()).expect("Couldn't write");
         
@@ -105,11 +108,13 @@ pub fn create_password() {
         let f = File::create("files/entrypass.json").expect("Unable to create file");
         let mut filebuf = io::BufWriter::new(f);
 
-        let retstr = format!("{{\"hash\": \"{}\", \"salt\": \"{}\"}}", phc, salt.as_str());
+        let retstr = format!("{{\"hash\": \"{}\", \"salt\": \"{}\", \"banksalt\": \"{}\"}}", phc, salt.as_str(), banksalt.as_str());
 
         filebuf.write(retstr.as_bytes()).expect("Couldn't write");
         
         filebuf.flush().expect("Unable to flush buffer");
     }
+
+    return (conf, banksalt.as_str().to_string());
 
 }
