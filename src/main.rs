@@ -1,6 +1,7 @@
 mod interface;
 mod login;
 mod appio;
+mod strengthestimation;
 
 use std::collections::HashMap;
 use std::fs::File;
@@ -71,8 +72,7 @@ fn main(){
             appio::view_password(table.get_passmap());
         }
         else if inpnum == 2 {
-            print!("Add password selected");
-            io::stdout().flush().unwrap();
+            appio::add_password(&mut table);
         }
         else if inpnum == 3 {
             print!("Remove password selected");

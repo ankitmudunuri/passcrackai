@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use std::io;
 use std::io::Write;
 use prettytable::{Table, row, cell};
+use crate::interface::ITable;
+use crate::strengthestimation::estimate;
 
 pub fn view_password(passmap: &HashMap<String, Vec<String>>){
 
@@ -71,8 +73,41 @@ pub fn view_password(passmap: &HashMap<String, Vec<String>>){
     io::stdin().read_line(&mut input).expect("Failed to read I/O");
 }
 
-pub fn add_password(){
+pub fn add_password(table: &mut ITable){
 
+    let mut input = String::new();
+
+    let mut tempvect: Vec<String> = Vec::new();
+    
+    print!("Enter the domain of the credentials that you want to add: ");
+    io::stdout().flush().unwrap();
+
+    io::stdin().read_line(&mut input).expect("Failed to read I/O");
+
+    let domain = input.clone();
+    input = "".to_string();
+
+    print!("Enter the username of the credentials that you want to add: ");
+    io::stdout().flush().unwrap();
+
+    io::stdin().read_line(&mut input).expect("Failed to read I/O");
+
+    tempvect.push(input.clone());
+    input = "".to_string();
+
+    print!("Enter the password of the credentials that you want to add: ");
+    io::stdout().flush().unwrap();
+
+    io::stdin().read_line(&mut input).expect("Failed to read I/O");
+
+    tempvect.push(input.clone());
+
+    let strength = estimate(input);
+    tempvect.push(strength);
+
+    input = "".to_string();
+
+    table.add(domain, tempvect);
 }
 
 pub fn remove_password(){
