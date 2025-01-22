@@ -6,6 +6,8 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::fs;
 use std::io::prelude::*;
+use std::io;
+use std::process;
 
 
 
@@ -42,21 +44,59 @@ fn main(){
     };
 
     let mut passbank = String::new();
-    let mut test: HashMap<String, Vec<String>> = std::collections::HashMap::new();
+    let mut initmap: HashMap<String, Vec<String>> = std::collections::HashMap::new();
+    let mut table = interface::ITable::init(&mut initmap);
     match bankfile.read_to_string(&mut passbank) {
         Err(why) => panic!("Error reading: {}", why),
         Ok(_) => 
         if passbank.is_empty() {
-            
         }
         else {
-
-
+            table.load(password, salt);
         }
 
     }
-    
-    let mut tabletest = interface::ITable::init(&mut test);
+    let mut inputstr = String::new();
+
+    loop {
+        inputstr = "".to_string();
+
+        table.print();
+        print!("Please enter what action you want to do (1 = Search/View Password, 2 = Add Password, 3 = Remove Password, 4 = Update Password, 5 = Quit): ");
+        io::stdout().flush().unwrap();
+        io::stdin().read_line(&mut inputstr).expect("Failed to read I/O");
+        let inpnum: u32 = inputstr.trim().parse().expect("Couldn't parse input");
+
+        if inpnum == 1 {
+            appio::view_password(table.get_passmap());
+        }
+        else if inpnum == 2 {
+            print!("Add password selected");
+            io::stdout().flush().unwrap();
+        }
+        else if inpnum == 3 {
+            print!("Remove password selected");
+            io::stdout().flush().unwrap();
+        }
+
+        else if inpnum == 4 {
+            print!("Update password selected");
+            io::stdout().flush().unwrap();
+        }
+
+        else if inpnum == 5 {
+            print!("\x1B[2J\x1B[H");
+            io::stdout().flush().unwrap();
+            print!("Goodbye!");
+            io::stdout().flush().unwrap();
+            process::exit(0);
+        }
+
+        else {
+            println!("That isn't a valid input");
+            io::stdout().flush().unwrap();
+        }
+    }
 
 /*
 
@@ -72,7 +112,5 @@ fn main(){
 
     tabletest.store(password.clone(), salt.clone());
     */
-
-    tabletest.load(password, salt);
-    tabletest.print();
+    table.print();
 }

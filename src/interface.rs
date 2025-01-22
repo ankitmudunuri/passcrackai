@@ -1,6 +1,8 @@
 use argon2::password_hash::SaltString;
 use prettytable::{Table, row, cell};
 use std::collections::HashMap;
+use std::io;
+use std::io::Write;
 mod datastore;
 
 pub struct ITable <'a>{
@@ -27,8 +29,10 @@ impl ITable <'_>{
     }
     
     pub fn print(&self){
-        print!("{esc}c", esc = 27 as char);
+        print!("\x1B[2J\x1B[H");
+        io::stdout().flush().unwrap();
         self.table.printstd();
+        io::stdout().flush().unwrap();
         return;
     }
 
@@ -61,4 +65,6 @@ impl ITable <'_>{
             self.size += 1;
         }
     }
+
+    pub fn get_passmap(&self) -> &HashMap<String, Vec<String>>{return &self.passmap}
 }
