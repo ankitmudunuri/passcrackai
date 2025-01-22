@@ -1,0 +1,6 @@
+*.py
+/data
+/files
+/target/*
+/target
+/sparefiles
