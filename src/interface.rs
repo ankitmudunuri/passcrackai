@@ -71,8 +71,30 @@ impl ITable <'_>{
     pub fn load(&mut self, password: String, salt: String) -> (){
         datastore::load_data(self.passmap, password, salt);
         for (k, v) in self.passmap.clone() {
-            self.table.add_row(row![k, v[0], v[1], v[2]]);
+            self.table.insert_row(v[3].parse::<usize>().expect("Failed usize conversion"), row![k, v[0], v[1], v[2]]);
             self.size += 1;
+        }
+    }
+
+    pub fn update(&mut self, key: String, mut vect: Vec<String>) -> (){
+        if let Some(values) = self.passmap.get(&key) {
+            if let Some(value) = values.get(3) {
+                if let Ok(mut trueidx) = value.parse::<i64>() {
+
+                    vect.push(trueidx.to_string());
+
+                    self.passmap.insert(key, vect.clone());
+
+                    self.table.set_element(&vect[0], 1, trueidx as usize);
+                    self.table.set_element(&vect[1], 2, trueidx as usize);
+                    self.table.set_element(&vect[2], 3, trueidx as usize);
+                    
+                    return;
+                }
+            }
+            println!("Error: Could not parse the index or find the 4th element.");
+        } else {
+            println!("Error: Key not found in passmap.");
         }
     }
 

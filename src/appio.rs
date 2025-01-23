@@ -145,6 +145,40 @@ pub fn remove_password(table: &mut ITable){
     io::stdin().read_line(&mut input).expect("Failed to read I/O");
 }
 
-pub fn update_password(){
+pub fn update_password(table: &mut ITable){
+    let mut input = String::new();
 
+    let mut tempvect: Vec<String> = Vec::new();
+    
+    print!("Enter the domain of the credentials that you want to update: ");
+    io::stdout().flush().unwrap();
+
+    io::stdin().read_line(&mut input).expect("Failed to read I/O");
+
+    let domain = input.clone();
+    input = "".to_string();
+
+    print!("Enter the new username: ");
+    io::stdout().flush().unwrap();
+
+    io::stdin().read_line(&mut input).expect("Failed to read I/O");
+
+    tempvect.push(input.clone());
+    input = "".to_string();
+
+    print!("Enter the new password: ");
+    io::stdout().flush().unwrap();
+
+    io::stdin().read_line(&mut input).expect("Failed to read I/O");
+
+    tempvect.push(input.clone());
+
+    let strength = estimate(input);
+    tempvect.push(strength);
+
+    input = "".to_string();
+
+    tempvect.push(table.get_size().to_string());
+
+    table.update(domain, tempvect);
 }

@@ -95,8 +95,7 @@ fn main(){
         }
 
         else if inpnum == 4 {
-            print!("Update password selected");
-            io::stdout().flush().unwrap();
+            appio::update_password(&mut table);
         }
 
         else if inpnum == 5 {
