@@ -82,7 +82,17 @@ fn main(){
         print!("Please enter what action you want to do (1 = Search/View Password, 2 = Add Password, 3 = Remove Password, 4 = Update Password, 5 = Quit): ");
         io::stdout().flush().unwrap();
         io::stdin().read_line(&mut inputstr).expect("Failed to read I/O");
-        let inpnum: u32 = inputstr.trim().parse().expect("Couldn't parse input");
+        let inpnum: u32 = match inputstr.trim().parse() {
+            Ok(num) => num,
+            Err(why) => {
+                println!("That isn't a valid input");
+                io::stdout().flush().unwrap();
+                println!("\n(Press ENTER to continue)");
+                io::stdout().flush().unwrap();
+                io::stdin().read_line(&mut inputstr).expect("Failed to read I/O");
+                continue;
+            }
+        };
 
         if inpnum == 1 {
             appio::view_password(table.get_passmap());
@@ -114,6 +124,9 @@ fn main(){
         else {
             println!("That isn't a valid input");
             io::stdout().flush().unwrap();
+            println!("\n(Press ENTER to continue)");
+            io::stdout().flush().unwrap();
+            io::stdin().read_line(&mut inputstr).expect("Failed to read I/O");
         }
     }
 
