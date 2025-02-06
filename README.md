@@ -4,6 +4,9 @@
 #### This is a password manager, built in Rust, that uses a Command Line Interface (CLI) to add, remove, and display saved credentials for different domains. It uses Argon2 encryption in order to keep credentials encrypted and safe, and utilizes a trained CNN to estimate password strength. 
 ---
 
+![image](https://github.com/user-attachments/assets/f16c1c05-4576-46f0-bf8a-c8a7825621c9)
+
+
 ### Setup
 To start, download the binaries of whichever release you want (both setup.exe and passwordmanager.exe). Put both of those executables in a folder together and then run setup.exe. Finally, you can run passwordmanager.exe and it will work!
  
