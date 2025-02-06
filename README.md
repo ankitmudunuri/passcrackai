@@ -1,7 +1,7 @@
 # PassCrackAI
 ## A CLI-based Password Manager with AI-Powered Password Strength Estimation
 
-#### This is a password manager, built in Rust, that uses a Command Line Interface (CLI) to add, remove, and display saved credentials for different domains. It uses Argon2 encryption in order to keep credentials encrypted and safe, and will eventually have a feature that uses a trained RNN to estimate password strength. 
+#### This is a password manager, built in Rust, that uses a Command Line Interface (CLI) to add, remove, and display saved credentials for different domains. It uses Argon2 encryption in order to keep credentials encrypted and safe, and utilizes a trained CNN to estimate password strength. 
 ---
 
 ### Setup
