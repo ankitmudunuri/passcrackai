@@ -17,7 +17,7 @@ On initialization, it will ask you to create a password. Enter the password that
 - 1: View a password based on keywords
 - 2: Add a password to the bank
 - 3: Remove a password from the bank (based on its domain)
-- 4: Update a password (not working yet)
+- 4: Update a password
 - 5: Quit and save changes
 
 For viewing credentials, it will first prompt you with which field you want to search by (Domain, Username, or Password). It will then prompt you with what keyword or phrase you want to search by. For instance, if you select "Domain" and enter "Gmail" then it will get all entries with domains that contain "Gmail". This also works for partial searches, so if you enter "Gma" then it will still find all Gmail entries.
